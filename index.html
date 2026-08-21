@@ -225,141 +225,162 @@
 </div>
 
 <script>
-  // Variable global untuk menyimpan data seluruh siswa
-let allSiswaData = [];
+  // Variable global untuk menyimpan data database
+  let allGuruData = [];
+  let allKelasData = [];
+  let allSiswaData = [];
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxDGnp8Zy1ojj40QyznCuVIp5UJboSGeWLHPDI7EfTWVFAb67cY3p3DEPF-9U_euifjhg/exec";
+  const WEB_APP_URL = "https://script.google.com/macros/library/d/1JFjlL1ULCOEuZfUIlSYL6T5jTUuNfg0JBw7-VPlb8UuXD7EHU60KVpgS/5";
 
-document.addEventListener('DOMContentLoaded', () => {
-  const savedEmail = localStorage.getItem('paud_guru_email');
-  if (savedEmail) document.getElementById('emailGuru').value = savedEmail;
+  document.addEventListener('DOMContentLoaded', () => {
+    const savedEmail = localStorage.getItem('paud_guru_email');
+    if (savedEmail) document.getElementById('emailGuru').value = savedEmail;
 
-  fetch(WEB_APP_URL)
-    .then(res => res.json())
-    .then(data => populateDropdowns(data))
-    .catch(err => console.error("Gagal memuat data:", err));
-});
-
-document.getElementById('emailGuru').addEventListener('input', (e) => {
-  localStorage.setItem('paud_guru_email', e.target.value);
-});
-
-// Event Listener: Jalankan filter siswa saat dropdown Kelas berubah
-document.getElementById('kelas').addEventListener('change', function() {
-  const selectedKelas = this.value;
-  updateSiswaDropdowns(selectedKelas);
-});
-
-function populateDropdowns(data) {
-  const guruSelect = document.getElementById('namaGuru');
-  const kelasSelect = document.getElementById('kelas');
-
-  // Simpan data siswa ke variabel global
-  allSiswaData = data.siswa || [];
-
-  // Populate Dropdown Nama Guru
-  guruSelect.innerHTML = '<option value="">-- Pilih Nama Guru --</option>';
-  data.guru.forEach(nama => {
-    guruSelect.innerHTML += `<option value="${nama}">${nama}</option>`;
+    // Fetch Data
+    fetch(WEB_APP_URL)
+      .then(res => res.json())
+      .then(data => {
+        allGuruData = data.guru || [];
+        allKelasData = data.kelas || [];
+        allSiswaData = data.siswa || [];
+        
+        // Inisialisasi awal dropdown
+        resetFormDropdowns();
+      })
+      .catch(err => console.error("Gagal memuat data database:", err));
   });
 
-  // Populate Dropdown Kelas
-  kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
-  data.kelas.forEach(kls => {
-    kelasSelect.innerHTML += `<option value="${kls}">${kls}</option>`;
+  document.getElementById('emailGuru').addEventListener('input', (e) => {
+    localStorage.setItem('paud_guru_email', e.target.value);
   });
 
-  // Reset dropdown imam sebelum kelas dipilih
-  updateSiswaDropdowns('');
-}
+  // EVENT 1: Saat Unit Dipilih / Berubah
+  document.getElementById('unit').addEventListener('change', function() {
+    const selectedUnit = this.value;
+    updateGuruAndKelasDropdowns(selectedUnit);
+  });
 
-// Fungsi memfilter siswa sesuai kelas yang dipilih
-function updateSiswaDropdowns(selectedKelas) {
-  const dhuhaSelect = document.getElementById('imamDhuha');
-  const dzuhurSelect = document.getElementById('imamDzuhur');
+  // EVENT 2: Saat Kelas Dipilih / Berubah
+  document.getElementById('kelas').addEventListener('change', function() {
+    const selectedKelas = this.value;
+    updateSiswaDropdowns(selectedKelas);
+  });
 
-  if (!selectedKelas) {
-    const defaultOpt = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
-    dhuhaSelect.innerHTML = defaultOpt;
-    dzuhurSelect.innerHTML = defaultOpt;
-    return;
+  // Reset awal saat halaman baru dimuat
+  function resetFormDropdowns() {
+    document.getElementById('namaGuru').innerHTML = '<option value="">-- Pilih Unit Terlebih Dahulu --</option>';
+    document.getElementById('kelas').innerHTML = '<option value="">-- Pilih Unit Terlebih Dahulu --</option>';
+    document.getElementById('imamDhuha').innerHTML = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
+    document.getElementById('imamDzuhur').innerHTML = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
   }
 
-  // Filter siswa berdasarkan kelas
-  const filteredSiswa = allSiswaData.filter(s => s.kelas === selectedKelas);
+  // Filter Dropdown Guru & Kelas berdasarkan Unit
+  function updateGuruAndKelasDropdowns(selectedUnit) {
+    const guruSelect = document.getElementById('namaGuru');
+    const kelasSelect = document.getElementById('kelas');
 
-  if (filteredSiswa.length === 0) {
-    const noDataOpt = '<option value="">-- Tidak ada siswa di kelas ini --</option>';
-    dhuhaSelect.innerHTML = noDataOpt;
-    dzuhurSelect.innerHTML = noDataOpt;
-    return;
-  }
+    if (!selectedUnit) {
+      resetFormDropdowns();
+      return;
+    }
 
-  const optionsHtml = '<option value="">-- Pilih Siswa --</option>' + 
-    filteredSiswa.map(s => `<option value="${s.nama}">${s.nama}</option>`).join('');
+    // Filter Guru (Tampilkan guru sesuai unit, atau guru tanpa unit spesifik)
+    const filteredGuru = allGuruData.filter(g => !g.unit || g.unit === selectedUnit);
+    guruSelect.innerHTML = '<option value="">-- Pilih Nama Guru --</option>' +
+      filteredGuru.map(g => `<option value="${g.nama}">${g.nama}</option>`).join('');
 
-  dhuhaSelect.innerHTML = optionsHtml;
-  dzuhurSelect.innerHTML = optionsHtml;
-}
+    // Filter Kelas (Tampilkan kelas sesuai unit)
+    const filteredKelas = allKelasData.filter(k => k.unit === selectedUnit);
+    kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>' +
+      filteredKelas.map(k => `<option value="${k.nama}">${k.nama}</option>`).join('');
 
-// Handle Form Submit (Versi Cepat tanpa Pre-Flight CORS Delay)
-document.getElementById('jurnalForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  const btn = document.getElementById('btnSubmit');
-  const msg = document.getElementById('statusMsg');
-
-  // Indikator visual langsung saat tombol diklik
-  btn.disabled = true;
-  btn.innerText = '⏳ Memproses & Menyimpan...';
-  msg.style.display = 'block';
-  msg.style.color = '#00ACC1';
-  msg.innerText = 'Sedang mengirim data ke Google Sheets...';
-
-  const payload = {
-    unit: document.getElementById('unit').value,
-    namaGuru: document.getElementById('namaGuru').value,
-    kelas: document.getElementById('kelas').value,
-    pertemuan: document.getElementById('pertemuan').value,
-    jumlahSiswa: document.getElementById('jumlahSiswa').value,
-    imamDhuha: document.getElementById('imamDhuha').value,
-    imamDzuhur: document.getElementById('imamDzuhur').value,
-    quran: document.getElementById('quran').value,
-    hadits: document.getElementById('hadits').value,
-    doa: document.getElementById('doa').value,
-    topik: document.getElementById('topik').value,
-    deskripsi: document.getElementById('deskripsi').value,
-    catatan: document.getElementById('catatan').value,
-    keberhasilan: document.getElementById('keberhasilan').value,
-    perbaikan: document.getElementById('perbaikan').value,
-    rtl: document.getElementById('rtl').value
-  };
-
-  // Menggunakan 'text/plain' melewati cek Pre-flight browser sehingga data terkirim LEBIH CEPAT
-  fetch(WEB_APP_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify(payload)
-  })
-  .then(() => {
-    btn.disabled = false;
-    btn.innerText = 'Kirim Jurnal Mengajar';
-    msg.style.color = '#2E7D32';
-    msg.innerText = ' Data berhasil dikirim ke Google Sheets!';
-
-    // Reset Form (Email tetap tersimpan)
-    const email = document.getElementById('emailGuru').value;
-    document.getElementById('jurnalForm').reset();
-    document.getElementById('emailGuru').value = email;
+    // Reset Dropdown Siswa/Imam
     updateSiswaDropdowns('');
-  })
-  .catch(err => {
-    btn.disabled = false;
-    btn.innerText = 'Kirim Jurnal Mengajar';
-    msg.style.color = '#C62828';
-    msg.innerText = 'Gagal menyimpan data. Periksa koneksi internet Anda.';
+  }
+
+  // Filter Dropdown Siswa berdasarkan Kelas
+  function updateSiswaDropdowns(selectedKelas) {
+    const dhuhaSelect = document.getElementById('imamDhuha');
+    const dzuhurSelect = document.getElementById('imamDzuhur');
+
+    if (!selectedKelas) {
+      const defaultOpt = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
+      dhuhaSelect.innerHTML = defaultOpt;
+      dzuhurSelect.innerHTML = defaultOpt;
+      return;
+    }
+
+    const filteredSiswa = allSiswaData.filter(s => s.kelas === selectedKelas);
+
+    if (filteredSiswa.length === 0) {
+      const noDataOpt = '<option value="">-- Tidak ada siswa di kelas ini --</option>';
+      dhuhaSelect.innerHTML = noDataOpt;
+      dzuhurSelect.innerHTML = noDataOpt;
+      return;
+    }
+
+    const optionsHtml = '<option value="">-- Pilih Siswa --</option>' + 
+      filteredSiswa.map(s => `<option value="${s.nama}">${s.nama}</option>`).join('');
+
+    dhuhaSelect.innerHTML = optionsHtml;
+    dzuhurSelect.innerHTML = optionsHtml;
+  }
+
+  // Handle Form Submit
+  document.getElementById('jurnalForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btnSubmit');
+    const msg = document.getElementById('statusMsg');
+
+    btn.disabled = true;
+    btn.innerText = '⏳ Memproses & Menyimpan...';
+    msg.style.display = 'block';
+    msg.style.color = '#00ACC1';
+    msg.innerText = 'Sedang mengirim data ke Google Sheets...';
+
+    const payload = {
+      unit: document.getElementById('unit').value,
+      namaGuru: document.getElementById('namaGuru').value,
+      kelas: document.getElementById('kelas').value,
+      pertemuan: document.getElementById('pertemuan').value,
+      jumlahSiswa: document.getElementById('jumlahSiswa').value,
+      imamDhuha: document.getElementById('imamDhuha').value,
+      imamDzuhur: document.getElementById('imamDzuhur').value,
+      quran: document.getElementById('quran').value,
+      hadits: document.getElementById('hadits').value,
+      doa: document.getElementById('doa').value,
+      topik: document.getElementById('topik').value,
+      deskripsi: document.getElementById('deskripsi').value,
+      catatan: document.getElementById('catatan').value,
+      keberhasilan: document.getElementById('keberhasilan').value,
+      perbaikan: document.getElementById('perbaikan').value,
+      rtl: document.getElementById('rtl').value
+    };
+
+    fetch(WEB_APP_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    })
+    .then(() => {
+      btn.disabled = false;
+      btn.innerText = 'Kirim Jurnal Mengajar';
+      msg.style.color = '#2E7D32';
+      msg.innerText = ' Data berhasil dikirim ke Google Sheets!';
+
+      const email = document.getElementById('emailGuru').value;
+      document.getElementById('jurnalForm').reset();
+      document.getElementById('emailGuru').value = email;
+      resetFormDropdowns();
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.innerText = 'Kirim Jurnal Mengajar';
+      msg.style.color = '#C62828';
+      msg.innerText = 'Gagal menyimpan data.';
+    });
   });
-});
 </script>
 
 </body>
