@@ -302,17 +302,18 @@ function updateSiswaDropdowns(selectedKelas) {
   dzuhurSelect.innerHTML = optionsHtml;
 }
 
-// Handle Form Submit
+// Handle Form Submit (Versi Cepat tanpa Pre-Flight CORS Delay)
 document.getElementById('jurnalForm').addEventListener('submit', function(e) {
   e.preventDefault();
   const btn = document.getElementById('btnSubmit');
   const msg = document.getElementById('statusMsg');
 
+  // Indikator visual langsung saat tombol diklik
   btn.disabled = true;
-  btn.innerText = 'Mengirim Data...';
+  btn.innerText = '⏳ Memproses & Menyimpan...';
   msg.style.display = 'block';
-  msg.style.color = '#78909C';
-  msg.innerText = 'Sedang menyimpan ke database...';
+  msg.style.color = '#00ACC1';
+  msg.innerText = 'Sedang mengirim data ke Google Sheets...';
 
   const payload = {
     unit: document.getElementById('unit').value,
@@ -333,10 +334,11 @@ document.getElementById('jurnalForm').addEventListener('submit', function(e) {
     rtl: document.getElementById('rtl').value
   };
 
+  // Menggunakan 'text/plain' melewati cek Pre-flight browser sehingga data terkirim LEBIH CEPAT
   fetch(WEB_APP_URL, {
     method: 'POST',
     mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify(payload)
   })
   .then(() => {
@@ -345,6 +347,7 @@ document.getElementById('jurnalForm').addEventListener('submit', function(e) {
     msg.style.color = '#2E7D32';
     msg.innerText = ' Data berhasil dikirim ke Google Sheets!';
 
+    // Reset Form (Email tetap tersimpan)
     const email = document.getElementById('emailGuru').value;
     document.getElementById('jurnalForm').reset();
     document.getElementById('emailGuru').value = email;
@@ -354,7 +357,7 @@ document.getElementById('jurnalForm').addEventListener('submit', function(e) {
     btn.disabled = false;
     btn.innerText = 'Kirim Jurnal Mengajar';
     msg.style.color = '#C62828';
-    msg.innerText = 'Gagal menyimpan data.';
+    msg.innerText = 'Gagal menyimpan data. Periksa koneksi internet Anda.';
   });
 });
 </script>
