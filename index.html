@@ -138,9 +138,11 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Kelas</label>
-          <input type="text" id="kelas" required placeholder="Contoh: TK-A / Kelompok Bermain">
-        </div>
+  <label>Kelas</label>
+  <select id="kelas" required>
+    <option value="">Memuat data kelas...</option>
+  </select>
+</div>
       </div>
       <div class="grid-2">
         <div class="form-group">
@@ -243,21 +245,30 @@
   });
 
   function populateDropdowns(data) {
-    const guruSelect = document.getElementById('namaGuru');
-    const dhuhaSelect = document.getElementById('imamDhuha');
-    const dzuhurSelect = document.getElementById('imamDzuhur');
+  const guruSelect = document.getElementById('namaGuru');
+  const kelasSelect = document.getElementById('kelas');
+  const dhuhaSelect = document.getElementById('imamDhuha');
+  const dzuhurSelect = document.getElementById('imamDzuhur');
 
-    guruSelect.innerHTML = '<option value="">-- Pilih Nama Guru --</option>';
-    data.guru.forEach(nama => {
-      guruSelect.innerHTML += `<option value="${nama}">${nama}</option>`;
-    });
+  // Mengisi Dropdown Nama Guru
+  guruSelect.innerHTML = '<option value="">-- Pilih Nama Guru --</option>';
+  data.guru.forEach(nama => {
+    guruSelect.innerHTML += `<option value="${nama}">${nama}</option>`;
+  });
 
-    const studentOptions = '<option value="">-- Pilih Siswa --</option>' + 
-      data.siswaLaki.map(nama => `<option value="${nama}">${nama}</option>`).join('');
-    
-    dhuhaSelect.innerHTML = studentOptions;
-    dzuhurSelect.innerHTML = studentOptions;
-  }
+  // Mengisi Dropdown Kelas dari Spreadsheet
+  kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+  data.kelas.forEach(kls => {
+    kelasSelect.innerHTML += `<option value="${kls}">${kls}</option>`;
+  });
+
+  // Mengisi Dropdown Imam Shalat (Siswa)
+  const studentOptions = '<option value="">-- Pilih Siswa --</option>' + 
+    data.siswa.map(nama => `<option value="${nama}">${nama}</option>`).join('');
+  
+  dhuhaSelect.innerHTML = studentOptions;
+  dzuhurSelect.innerHTML = studentOptions;
+}
 
   document.getElementById('jurnalForm').addEventListener('submit', function(e) {
     e.preventDefault();
