@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jurnal Mengajar PAUD IT Al-Kautsar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #F4FBF7;
+      --card-bg: #FFFFFF;
+      --primary: #00ACC1;
+      --primary-light: #E0F7FA;
+      --accent-yellow: #FFF9C4;
+      --accent-green: #E8F5E9;
+      --accent-pink: #FFEBEE;
+      --text-dark: #37474F;
+      --text-muted: #78909C;
+      --border-color: #CFD8DC;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-dark); padding: 20px 12px; }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px dashed var(--primary-light);
+    }
+    .header h1 { font-size: 22px; color: var(--primary); font-weight: 700; }
+    .header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+    .section-card {
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+    .sec-a { background-color: var(--primary-light); }
+    .sec-b { background-color: var(--accent-yellow); }
+    .sec-c { background-color: var(--accent-green); }
+    .sec-d { background-color: var(--accent-pink); }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: var(--text-dark);
+    }
+
+    .form-group { margin-bottom: 12px; }
+    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; }
+
+    input[type="text"], input[type="email"], input[type="number"], select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 13px;
+      background-color: #FFF;
+      outline: none;
+      transition: all 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 172, 193, 0.2);
+    }
+    textarea { resize: vertical; min-height: 75px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 580px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--primary);
+      color: #FFF;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,172,193,0.3);
+      transition: background 0.2s;
+    }
+    .btn-submit:hover { background: #0097A7; }
+
+    .status-msg {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>Jurnal Mengajar PAUD IT Al-Kautsar</h1>
+    <p>Sistem Input Informasi Kegiatan Pembelajaran Harian</p>
+  </div>
+
+  <form id="jurnalForm">
+    <!-- Bagian A -->
+    <div class="section-card sec-a">
+      <div class="section-title">Bagian A: Identitas Mengajar</div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Email Guru</label>
+          <input type="email" id="emailGuru" required placeholder="nama@gmail.com">
+        </div>
+        <div class="form-group">
+          <label>Unit</label>
+          <select id="unit" required>
+            <option value="">-- Pilih Unit --</option>
+            <option value="PAUD IT Al-Kautsar 1">PAUD IT Al-Kautsar 1</option>
+            <option value="PAUD IT Al-Kautsar 2">PAUD IT Al-Kautsar 2</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Nama Guru</label>
+          <select id="namaGuru" required>
+            <option value="">Memuat data guru...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Kelas</label>
+          <input type="text" id="kelas" required placeholder="Contoh: TK-A / Kelompok Bermain">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Pertemuan Ke-</label>
+          <input type="number" id="pertemuan" min="1" step="1" required placeholder="1">
+        </div>
+        <div class="form-group">
+          <label>Jumlah Siswa Hadir</label>
+          <input type="number" id="jumlahSiswa" min="0" required placeholder="0">
+        </div>
+      </div>
+    </div>
+
+    <!-- Bagian B -->
+    <div class="section-card sec-b">
+      <div class="section-title">Bagian B: Pembiasaan & Hafalan</div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Imam Shalat Dhuha</label>
+          <select id="imamDhuha"><option value="">Memuat data siswa...</option></select>
+        </div>
+        <div class="form-group">
+          <label>Imam Shalat Dzuhur</label>
+          <select id="imamDzuhur"><option value="">Memuat data siswa...</option></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Hafalan Al-Qur'an</label>
+        <input type="text" id="quran" placeholder="Contoh: QS. An-Naba' ayat 1-5">
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Hafalan Hadits</label>
+          <input type="text" id="hadits" placeholder="Contoh: Hadits Menuntut Ilmu">
+        </div>
+        <div class="form-group">
+          <label>Hafalan Do'a</label>
+          <input type="text" id="doa" placeholder="Contoh: Doa Sebelum Makan">
+        </div>
+      </div>
+    </div>
+
+    <!-- Bagian C -->
+    <div class="section-card sec-c">
+      <div class="section-title">Bagian C: Kegiatan Inti Pembelajaran</div>
+      <div class="form-group">
+        <label>Topik/Tema</label>
+        <input type="text" id="topik" required placeholder="Contoh: Tanaman / Mengenal Buah Apel">
+      </div>
+      <div class="form-group">
+        <label>Deskripsi Kegiatan</label>
+        <textarea id="deskripsi" required placeholder="Jelaskan alur kegiatan pembelajaran secara singkat..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Catatan Pengamatan Siswa</label>
+        <textarea id="catatan" placeholder="Tuliskan Fakta Lapangan: perilaku, respon, atau kejadian unik anak saat kegiatan..."></textarea>
+      </div>
+    </div>
+
+    <!-- Bagian D -->
+    <div class="section-card sec-d">
+      <div class="section-title">Bagian D: Refleksi Guru</div>
+      <div class="form-group">
+        <label>Keberhasilan</label>
+        <textarea id="keberhasilan" placeholder="Contoh: Anak-anak sangat antusias dan media pembelajaran bekerja dengan baik."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Perbaikan</label>
+        <textarea id="perbaikan" placeholder="Contoh: Alokasi waktu pengenalan bahan terlalu singkat, perlu penyesuaian."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Rencana Tindak Lanjut</label>
+        <textarea id="rtl" placeholder="Contoh: Menyiapkan alat peraga ekstra untuk anak yang butuh pendampingan khusus."></textarea>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-submit" id="btnSubmit">Kirim Jurnal Mengajar</button>
+    <div class="status-msg" id="statusMsg"></div>
+  </form>
+</div>
+
+<script>
+  // MASUKKAN URL WEB APP APPS SCRIPT ANDA DI SINI
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxDGnp8Zy1ojj40QyznCuVIp5UJboSGeWLHPDI7EfTWVFAb67cY3p3DEPF-9U_euifjhg/exec";
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // LocalStorage untuk Email Guru
+    const savedEmail = localStorage.getItem('paud_guru_email');
+    if (savedEmail) document.getElementById('emailGuru').value = savedEmail;
+
+    // Fetch Dropdown Data dari Apps Script
+    fetch(WEB_APP_URL)
+      .then(res => res.json())
+      .then(data => populateDropdowns(data))
+      .catch(err => console.error("Gagal memuat dropdown:", err));
+  });
+
+  document.getElementById('emailGuru').addEventListener('input', (e) => {
+    localStorage.setItem('paud_guru_email', e.target.value);
+  });
+
+  function populateDropdowns(data) {
+    const guruSelect = document.getElementById('namaGuru');
+    const dhuhaSelect = document.getElementById('imamDhuha');
+    const dzuhurSelect = document.getElementById('imamDzuhur');
+
+    guruSelect.innerHTML = '<option value="">-- Pilih Nama Guru --</option>';
+    data.guru.forEach(nama => {
+      guruSelect.innerHTML += `<option value="${nama}">${nama}</option>`;
+    });
+
+    const studentOptions = '<option value="">-- Pilih Siswa --</option>' + 
+      data.siswaLaki.map(nama => `<option value="${nama}">${nama}</option>`).join('');
+    
+    dhuhaSelect.innerHTML = studentOptions;
+    dzuhurSelect.innerHTML = studentOptions;
+  }
+
+  document.getElementById('jurnalForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btnSubmit');
+    const msg = document.getElementById('statusMsg');
+
+    btn.disabled = true;
+    btn.innerText = 'Mengirim Data...';
+    msg.style.display = 'block';
+    msg.style.color = '#78909C';
+    msg.innerText = 'Sedang menyimpan ke database...';
+
+    const payload = {
+      unit: document.getElementById('unit').value,
+      namaGuru: document.getElementById('namaGuru').value,
+      kelas: document.getElementById('kelas').value,
+      pertemuan: document.getElementById('pertemuan').value,
+      jumlahSiswa: document.getElementById('jumlahSiswa').value,
+      imamDhuha: document.getElementById('imamDhuha').value,
+      imamDzuhur: document.getElementById('imamDzuhur').value,
+      quran: document.getElementById('quran').value,
+      hadits: document.getElementById('hadits').value,
+      doa: document.getElementById('doa').value,
+      topik: document.getElementById('topik').value,
+      deskripsi: document.getElementById('deskripsi').value,
+      catatan: document.getElementById('catatan').value,
+      keberhasilan: document.getElementById('keberhasilan').value,
+      perbaikan: document.getElementById('perbaikan').value,
+      rtl: document.getElementById('rtl').value
+    };
+
+    fetch(WEB_APP_URL, {
+      method: 'POST',
+      mode: 'no-cors', // Mencegah kendala blokir CORS browser pada form submission
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(() => {
+      btn.disabled = false;
+      btn.innerText = 'Kirim Jurnal Mengajar';
+      msg.style.color = '#2E7D32';
+      msg.innerText = ' Data berhasil dikirim ke Google Sheets!';
+
+      const email = document.getElementById('emailGuru').value;
+      document.getElementById('jurnalForm').reset();
+      document.getElementById('emailGuru').value = email;
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.innerText = 'Kirim Jurnal Mengajar';
+      msg.style.color = '#C62828';
+      msg.innerText = 'Gagal menyimpan data.';
+    });
+  });
+</script>
+
+</body>
+</html>
