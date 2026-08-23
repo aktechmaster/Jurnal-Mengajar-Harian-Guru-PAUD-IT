@@ -64,7 +64,7 @@
     .form-group { margin-bottom: 12px; }
     label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; }
 
-    input[type="text"], input[type="email"], input[type="number"], input[type="file"], select, textarea {
+    input[type="text"], input[type="email"], input[type="number"], select, textarea {
       width: 100%;
       padding: 10px 12px;
       border: 1px solid var(--border-color);
@@ -82,6 +82,30 @@
 
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     @media (max-width: 580px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* Style Khusus Tombol Photo */
+    .btn-photo {
+      width: 100%;
+      background: #FFFFFF;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-photo:hover {
+      background: var(--primary-light);
+    }
+    .btn-photo:active {
+      transform: scale(0.98);
+    }
 
     .btn-submit {
       width: 100%;
@@ -107,7 +131,7 @@
     }
 
     .preview-box {
-      margin-top: 10px;
+      margin-top: 14px;
       text-align: center;
       display: none;
     }
@@ -249,14 +273,29 @@
       </div>
     </div>
 
-    <!-- Bagian E: Bukti Pembelajaran -->
+    <!-- Bagian E: Bukti Pembelajaran (Sesuai Permintaan) -->
     <div class="section-card sec-e">
       <div class="section-title">Bagian E: Bukti Pembelajaran (Foto)</div>
       <div class="form-group">
-        <label>Unggah / Ambil Foto Kegiatan (Opsional)</label>
-        <input type="file" id="fotoInput" accept="image/*">
-        <small style="display:block; color:var(--text-muted); margin-top:4px;">*Foto akan otomatis dikompresi agar hemat kuota.</small>
+        <label>Bukti Foto Mengajar (Opsional)</label>
+        <div class="grid-2">
+          <button type="button" class="btn-photo" onclick="document.getElementById('inputKamera').click()">
+            📷 Ambil Kamera
+          </button>
+          <button type="button" class="btn-photo" onclick="document.getElementById('inputGaleri').click()">
+            🖼️ Pilih dari Galeri
+          </button>
+        </div>
+
+        <!-- Input Tersembunyi khusus Kamera -->
+        <input type="file" id="inputKamera" accept="image/*" capture="environment" style="display: none;">
+        
+        <!-- Input Tersembunyi khusus Galeri -->
+        <input type="file" id="inputGaleri" accept="image/*" style="display: none;">
+
+        <small style="display:block; color:var(--text-muted); margin-top:8px;">*Foto akan otomatis dikompresi agar hemat kuota.</small>
       </div>
+
       <div class="preview-box" id="previewBox">
         <img id="imgPreview" src="" alt="Preview Foto">
       </div>
@@ -275,7 +314,7 @@
   let allGuruData = [];
   let allKelasData = [];
   let allSiswaData = [];
-  let compressedFotoBase64 = ""; // Menampung hasil konversi & kompresi foto
+  let compressedFotoBase64 = "";
 
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxDGnp8Zy1ojj40QyznCuVIp5UJboSGeWLHPDI7EfTWVFAb67cY3p3DEPF-9U_euifjhg/exec";
 
@@ -306,9 +345,8 @@
     updateSiswaDropdowns(this.value);
   });
 
-  // LOGIK KOMPRESI FOTO (Client-Side HTML Canvas)
-  document.getElementById('fotoInput').addEventListener('change', function(e) {
-    const file = e.target.files[0];
+  // FUNGSI KOMPRESI FOTO BERSAMA (Kamera & Galeri)
+  function processAndCompressImage(file) {
     if (!file) {
       compressedFotoBase64 = "";
       document.getElementById('previewBox').style.display = 'none';
@@ -322,7 +360,7 @@
         const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
-        const maxDimension = 800; // Maksimal resolusi 800px (Sangat cukup untuk dokumen)
+        const maxDimension = 800; // Resolusi max 800px
 
         if (width > height) {
           if (width > maxDimension) {
@@ -341,10 +379,10 @@
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
 
-        // Kompres ke JPEG Kualitas 0.7 (Ukuran kecil, gambar tetap jernih)
+        // Kompresi ke JPEG (Kualitas 0.7)
         compressedFotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
         
-        // Tampilkan Preview
+        // Tampilkan Preview Foto
         const previewImg = document.getElementById('imgPreview');
         previewImg.src = compressedFotoBase64;
         document.getElementById('previewBox').style.display = 'block';
@@ -352,6 +390,22 @@
       img.src = event.target.result;
     };
     reader.readAsDataURL(file);
+  }
+
+  // Event Listener Kamera
+  document.getElementById('inputKamera').addEventListener('change', function(e) {
+    if (e.target.files && e.target.files[0]) {
+      document.getElementById('inputGaleri').value = ""; // Reset input galeri
+      processAndCompressImage(e.target.files[0]);
+    }
+  });
+
+  // Event Listener Galeri
+  document.getElementById('inputGaleri').addEventListener('change', function(e) {
+    if (e.target.files && e.target.files[0]) {
+      document.getElementById('inputKamera').value = ""; // Reset input kamera
+      processAndCompressImage(e.target.files[0]);
+    }
   });
 
   function resetFormDropdowns() {
@@ -437,7 +491,7 @@
       keberhasilan: document.getElementById('keberhasilan').value,
       perbaikan: document.getElementById('perbaikan').value,
       rtl: document.getElementById('rtl').value,
-      fotoBase64: compressedFotoBase64 // Dikirimkan bersama data teks
+      fotoBase64: compressedFotoBase64
     };
 
     fetch(WEB_APP_URL, {
@@ -455,6 +509,10 @@
       const email = document.getElementById('emailGuru').value;
       document.getElementById('jurnalForm').reset();
       document.getElementById('emailGuru').value = email;
+      
+      // Reset input foto & preview
+      document.getElementById('inputKamera').value = "";
+      document.getElementById('inputGaleri').value = "";
       compressedFotoBase64 = "";
       document.getElementById('previewBox').style.display = 'none';
       resetFormDropdowns();
