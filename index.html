@@ -15,6 +15,7 @@
       --accent-yellow: #FFF9C4;
       --accent-green: #E8F5E9;
       --accent-pink: #FFEBEE;
+      --accent-purple: #EDE7F6;
       --text-dark: #37474F;
       --text-muted: #78909C;
       --border-color: #CFD8DC;
@@ -51,6 +52,7 @@
     .sec-b { background-color: var(--accent-yellow); }
     .sec-c { background-color: var(--accent-green); }
     .sec-d { background-color: var(--accent-pink); }
+    .sec-e { background-color: var(--accent-purple); }
 
     .section-title {
       font-size: 15px;
@@ -62,7 +64,7 @@
     .form-group { margin-bottom: 12px; }
     label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; }
 
-    input[type="text"], input[type="email"], input[type="number"], select, textarea {
+    input[type="text"], input[type="email"], input[type="number"], input[type="file"], select, textarea {
       width: 100%;
       padding: 10px 12px;
       border: 1px solid var(--border-color);
@@ -102,6 +104,18 @@
       font-size: 13px;
       font-weight: 600;
       display: none;
+    }
+
+    .preview-box {
+      margin-top: 10px;
+      text-align: center;
+      display: none;
+    }
+    .preview-box img {
+      max-width: 100%;
+      max-height: 220px;
+      border-radius: 10px;
+      border: 2px solid var(--primary);
     }
 
     .footer {
@@ -235,21 +249,33 @@
       </div>
     </div>
 
+    <!-- Bagian E: Bukti Pembelajaran -->
+    <div class="section-card sec-e">
+      <div class="section-title">Bagian E: Bukti Pembelajaran (Foto)</div>
+      <div class="form-group">
+        <label>Unggah / Ambil Foto Kegiatan (Opsional)</label>
+        <input type="file" id="fotoInput" accept="image/*" capture="environment">
+        <small style="display:block; color:var(--text-muted); margin-top:4px;">*Foto akan otomatis dikompresi agar hemat kuota.</small>
+      </div>
+      <div class="preview-box" id="previewBox">
+        <img id="imgPreview" src="" alt="Preview Foto">
+      </div>
+    </div>
+
     <button type="submit" class="btn-submit" id="btnSubmit">Kirim Jurnal Mengajar</button>
     <div class="status-msg" id="statusMsg"></div>
   </form>
 
-  <!-- Footer Copyright -->
   <div class="footer">
     PAUD IT Al-Kautsar Mukomuko 2026 | Designed and Developed by aktechmaster
   </div>
 </div>
 
 <script>
-  // Variable global untuk menyimpan data database
   let allGuruData = [];
   let allKelasData = [];
   let allSiswaData = [];
+  let compressedFotoBase64 = ""; // Menampung hasil konversi & kompresi foto
 
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxDGnp8Zy1ojj40QyznCuVIp5UJboSGeWLHPDI7EfTWVFAb67cY3p3DEPF-9U_euifjhg/exec";
 
@@ -257,15 +283,12 @@
     const savedEmail = localStorage.getItem('paud_guru_email');
     if (savedEmail) document.getElementById('emailGuru').value = savedEmail;
 
-    // Fetch Data
     fetch(WEB_APP_URL)
       .then(res => res.json())
       .then(data => {
         allGuruData = data.guru || [];
         allKelasData = data.kelas || [];
         allSiswaData = data.siswa || [];
-        
-        // Inisialisasi awal dropdown
         resetFormDropdowns();
       })
       .catch(err => console.error("Gagal memuat data database:", err));
@@ -275,19 +298,62 @@
     localStorage.setItem('paud_guru_email', e.target.value);
   });
 
-  // EVENT 1: Saat Unit Dipilih / Berubah
   document.getElementById('unit').addEventListener('change', function() {
-    const selectedUnit = this.value;
-    updateGuruAndKelasDropdowns(selectedUnit);
+    updateGuruAndKelasDropdowns(this.value);
   });
 
-  // EVENT 2: Saat Kelas Dipilih / Berubah
   document.getElementById('kelas').addEventListener('change', function() {
-    const selectedKelas = this.value;
-    updateSiswaDropdowns(selectedKelas);
+    updateSiswaDropdowns(this.value);
   });
 
-  // Reset awal saat halaman baru dimuat
+  // LOGIK KOMPRESI FOTO (Client-Side HTML Canvas)
+  document.getElementById('fotoInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) {
+      compressedFotoBase64 = "";
+      document.getElementById('previewBox').style.display = 'none';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const maxDimension = 800; // Maksimal resolusi 800px (Sangat cukup untuk dokumen)
+
+        if (width > height) {
+          if (width > maxDimension) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          }
+        } else {
+          if (height > maxDimension) {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Kompres ke JPEG Kualitas 0.7 (Ukuran kecil, gambar tetap jernih)
+        compressedFotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+        
+        // Tampilkan Preview
+        const previewImg = document.getElementById('imgPreview');
+        previewImg.src = compressedFotoBase64;
+        document.getElementById('previewBox').style.display = 'block';
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
   function resetFormDropdowns() {
     document.getElementById('namaGuru').innerHTML = '<option value="">-- Pilih Unit Terlebih Dahulu --</option>';
     document.getElementById('kelas').innerHTML = '<option value="">-- Pilih Unit Terlebih Dahulu --</option>';
@@ -295,7 +361,6 @@
     document.getElementById('imamDzuhur').innerHTML = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
   }
 
-  // Filter Dropdown Guru & Kelas berdasarkan Unit
   function updateGuruAndKelasDropdowns(selectedUnit) {
     const guruSelect = document.getElementById('namaGuru');
     const kelasSelect = document.getElementById('kelas');
@@ -305,21 +370,17 @@
       return;
     }
 
-    // Filter Guru (Tampilkan guru sesuai unit, atau guru tanpa unit spesifik)
     const filteredGuru = allGuruData.filter(g => !g.unit || g.unit === selectedUnit);
     guruSelect.innerHTML = '<option value="">-- Pilih Nama Guru --</option>' +
       filteredGuru.map(g => `<option value="${g.nama}">${g.nama}</option>`).join('');
 
-    // Filter Kelas (Tampilkan kelas sesuai unit)
     const filteredKelas = allKelasData.filter(k => k.unit === selectedUnit);
     kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>' +
       filteredKelas.map(k => `<option value="${k.nama}">${k.nama}</option>`).join('');
 
-    // Reset Dropdown Siswa/Imam
     updateSiswaDropdowns('');
   }
 
-  // Filter Dropdown Siswa berdasarkan Kelas
   function updateSiswaDropdowns(selectedKelas) {
     const dhuhaSelect = document.getElementById('imamDhuha');
     const dzuhurSelect = document.getElementById('imamDzuhur');
@@ -347,7 +408,6 @@
     dzuhurSelect.innerHTML = optionsHtml;
   }
 
-  // Handle Form Submit
   document.getElementById('jurnalForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const btn = document.getElementById('btnSubmit');
@@ -376,7 +436,8 @@
       catatan: document.getElementById('catatan').value,
       keberhasilan: document.getElementById('keberhasilan').value,
       perbaikan: document.getElementById('perbaikan').value,
-      rtl: document.getElementById('rtl').value
+      rtl: document.getElementById('rtl').value,
+      fotoBase64: compressedFotoBase64 // Dikirimkan bersama data teks
     };
 
     fetch(WEB_APP_URL, {
@@ -394,6 +455,8 @@
       const email = document.getElementById('emailGuru').value;
       document.getElementById('jurnalForm').reset();
       document.getElementById('emailGuru').value = email;
+      compressedFotoBase64 = "";
+      document.getElementById('previewBox').style.display = 'none';
       resetFormDropdowns();
     })
     .catch(err => {
