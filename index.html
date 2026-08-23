@@ -249,16 +249,18 @@
       </div>
     </div>
 
-    <div class="form-group">
-        <label>Bukti Foto Mengajar</label>
-        <div class="grid-2">
-          <button type="button" class="btn-photo" onclick="document.getElementById('inputKamera').click()">
-            📷 Ambil Kamera
-          </button>
-          <button type="button" class="btn-photo" onclick="document.getElementById('inputGaleri').click()">
-            🖼️ Pilih dari Galeri
-          </button>
-        </div>
+    <!-- Bagian E: Bukti Pembelajaran -->
+    <div class="section-card sec-e">
+      <div class="section-title">Bagian E: Bukti Pembelajaran (Foto)</div>
+      <div class="form-group">
+        <label>Unggah / Ambil Foto Kegiatan (Opsional)</label>
+        <input type="file" id="fotoInput" accept="image/*">
+        <small style="display:block; color:var(--text-muted); margin-top:4px;">*Foto akan otomatis dikompresi agar hemat kuota.</small>
+      </div>
+      <div class="preview-box" id="previewBox">
+        <img id="imgPreview" src="" alt="Preview Foto">
+      </div>
+    </div>
 
     <button type="submit" class="btn-submit" id="btnSubmit">Kirim Jurnal Mengajar</button>
     <div class="status-msg" id="statusMsg"></div>
