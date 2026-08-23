@@ -81,46 +81,6 @@
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     @media (max-width: 580px) { .grid-2 { grid-template-columns: 1fr; } }
 
-    /* Style Tombol Upload Foto (Kamera & Galeri) */
-    .btn-photo {
-      background-color: #FFF;
-      border: 1.5px solid var(--primary);
-      color: var(--primary);
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all 0.2s;
-      width: 100%;
-    }
-    .btn-photo:hover {
-      background-color: var(--primary-light);
-    }
-
-    /* Area Preview Foto */
-    .img-preview-container {
-      margin-top: 12px;
-      text-align: center;
-      display: none;
-    }
-    .img-preview {
-      max-width: 100%;
-      max-height: 220px;
-      border-radius: 10px;
-      border: 2px solid var(--primary);
-    }
-    .img-info {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 4px;
-      font-weight: 600;
-    }
-
     .btn-submit {
       width: 100%;
       background: var(--primary);
@@ -256,29 +216,6 @@
         <label for="catatan">Catatan Pengamatan Siswa</label>
         <textarea id="catatan" placeholder="Tuliskan Fakta Lapangan: perilaku, respon, atau kejadian unik anak saat kegiatan..."></textarea>
       </div>
-
-      <!-- PILIHAN OPSI FOTO (KAMERA & GALERI TERPISAH) -->
-      <div class="form-group">
-        <label>Bukti Foto Mengajar</label>
-        <div class="grid-2">
-          <button type="button" class="btn-photo" onclick="document.getElementById('inputKamera').click()">
-            📷 Ambil Kamera
-          </button>
-          <button type="button" class="btn-photo" onclick="document.getElementById('inputGaleri').click()">
-            🖼️ Pilih dari Galeri
-          </button>
-        </div>
-
-        <!-- Input Tersembunyi -->
-        <input type="file" id="inputKamera" accept="image/*" capture="environment" style="display:none">
-        <input type="file" id="inputGaleri" accept="image/*" style="display:none">
-
-        <!-- Area Preview Foto -->
-        <div class="img-preview-container" id="previewContainer">
-          <img id="imgPreview" class="img-preview" src="" alt="Preview Foto">
-          <div class="img-info" id="imgInfo"></div>
-        </div>
-      </div>
     </div>
 
     <!-- Bagian D -->
@@ -302,16 +239,17 @@
     <div class="status-msg" id="statusMsg"></div>
   </form>
 
+  <!-- Footer Copyright -->
   <div class="footer">
     PAUD IT Al-Kautsar Mukomuko 2026 | Designed and Developed by aktechmaster
   </div>
 </div>
 
 <script>
+  // Variable global untuk menyimpan data database
   let allGuruData = [];
   let allKelasData = [];
   let allSiswaData = [];
-  let compressedBase64Foto = "";
 
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxDGnp8Zy1ojj40QyznCuVIp5UJboSGeWLHPDI7EfTWVFAb67cY3p3DEPF-9U_euifjhg/exec";
 
@@ -319,12 +257,15 @@
     const savedEmail = localStorage.getItem('paud_guru_email');
     if (savedEmail) document.getElementById('emailGuru').value = savedEmail;
 
+    // Fetch Data
     fetch(WEB_APP_URL)
       .then(res => res.json())
       .then(data => {
         allGuruData = data.guru || [];
         allKelasData = data.kelas || [];
         allSiswaData = data.siswa || [];
+        
+        // Inisialisasi awal dropdown
         resetFormDropdowns();
       })
       .catch(err => console.error("Gagal memuat data database:", err));
@@ -334,72 +275,19 @@
     localStorage.setItem('paud_guru_email', e.target.value);
   });
 
+  // EVENT 1: Saat Unit Dipilih / Berubah
   document.getElementById('unit').addEventListener('change', function() {
-    updateGuruAndKelasDropdowns(this.value);
+    const selectedUnit = this.value;
+    updateGuruAndKelasDropdowns(selectedUnit);
   });
 
+  // EVENT 2: Saat Kelas Dipilih / Berubah
   document.getElementById('kelas').addEventListener('change', function() {
-    updateSiswaDropdowns(this.value);
+    const selectedKelas = this.value;
+    updateSiswaDropdowns(selectedKelas);
   });
 
-  // PENANGANAN INPUT FOTO & KOMPRESI (UNTUK KAMERA DAN GALERI)
-  const inputKamera = document.getElementById('inputKamera');
-  const inputGaleri = document.getElementById('inputGaleri');
-
-  inputKamera.addEventListener('change', function(e) { processPhotoInput(e.target); });
-  inputGaleri.addEventListener('change', function(e) { processPhotoInput(e.target); });
-
-  function processPhotoInput(inputElement) {
-    const file = inputElement.files[0];
-    if (!file) return;
-
-    const originalSizeKb = (file.size / 1024).toFixed(1);
-    const reader = new FileReader();
-
-    reader.onload = function(event) {
-      const img = new Image();
-      img.src = event.target.result;
-
-      img.onload = function() {
-        const maxWidth = 1000;
-        const maxHeight = 1000;
-        let width = img.width;
-        let height = img.height;
-
-        if (width > height) {
-          if (width > maxWidth) {
-            height = Math.round((height * maxWidth) / width);
-            width = maxWidth;
-          }
-        } else {
-          if (height > maxHeight) {
-            width = Math.round((width * maxHeight) / height);
-            height = maxHeight;
-          }
-        }
-
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-
-        // Kompres ke format JPEG Kualitas 65%
-        compressedBase64Foto = canvas.toDataURL('image/jpeg', 0.65);
-
-        const compressedSizeKb = (compressedBase64Foto.length * (3/4) / 1024).toFixed(1);
-
-        // Tampilkan Preview & Info
-        document.getElementById('imgPreview').src = compressedBase64Foto;
-        document.getElementById('imgInfo').innerText = `Ukuran Asli: ${originalSizeKb} KB ➜ Hasil Kompresi: ${compressedSizeKb} KB`;
-        document.getElementById('previewContainer').style.display = 'block';
-      };
-    };
-
-    reader.readAsDataURL(file);
-  }
-
+  // Reset awal saat halaman baru dimuat
   function resetFormDropdowns() {
     document.getElementById('namaGuru').innerHTML = '<option value="">-- Pilih Unit Terlebih Dahulu --</option>';
     document.getElementById('kelas').innerHTML = '<option value="">-- Pilih Unit Terlebih Dahulu --</option>';
@@ -407,6 +295,7 @@
     document.getElementById('imamDzuhur').innerHTML = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
   }
 
+  // Filter Dropdown Guru & Kelas berdasarkan Unit
   function updateGuruAndKelasDropdowns(selectedUnit) {
     const guruSelect = document.getElementById('namaGuru');
     const kelasSelect = document.getElementById('kelas');
@@ -416,17 +305,21 @@
       return;
     }
 
+    // Filter Guru (Tampilkan guru sesuai unit, atau guru tanpa unit spesifik)
     const filteredGuru = allGuruData.filter(g => !g.unit || g.unit === selectedUnit);
     guruSelect.innerHTML = '<option value="">-- Pilih Nama Guru --</option>' +
       filteredGuru.map(g => `<option value="${g.nama}">${g.nama}</option>`).join('');
 
+    // Filter Kelas (Tampilkan kelas sesuai unit)
     const filteredKelas = allKelasData.filter(k => k.unit === selectedUnit);
     kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>' +
       filteredKelas.map(k => `<option value="${k.nama}">${k.nama}</option>`).join('');
 
+    // Reset Dropdown Siswa/Imam
     updateSiswaDropdowns('');
   }
 
+  // Filter Dropdown Siswa berdasarkan Kelas
   function updateSiswaDropdowns(selectedKelas) {
     const dhuhaSelect = document.getElementById('imamDhuha');
     const dzuhurSelect = document.getElementById('imamDzuhur');
@@ -454,17 +347,17 @@
     dzuhurSelect.innerHTML = optionsHtml;
   }
 
-  // Handle Submit Form
+  // Handle Form Submit
   document.getElementById('jurnalForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const btn = document.getElementById('btnSubmit');
     const msg = document.getElementById('statusMsg');
 
     btn.disabled = true;
-    btn.innerText = '⏳ Memproses & Mengunggah Foto...';
+    btn.innerText = '⏳ Memproses & Menyimpan...';
     msg.style.display = 'block';
     msg.style.color = '#00ACC1';
-    msg.innerText = 'Sedang mengirim data dan foto ke sistem...';
+    msg.innerText = 'Sedang mengirim data ke Google Sheets...';
 
     const payload = {
       unit: document.getElementById('unit').value,
@@ -483,8 +376,7 @@
       catatan: document.getElementById('catatan').value,
       keberhasilan: document.getElementById('keberhasilan').value,
       perbaikan: document.getElementById('perbaikan').value,
-      rtl: document.getElementById('rtl').value,
-      fotoBase64: compressedBase64Foto
+      rtl: document.getElementById('rtl').value
     };
 
     fetch(WEB_APP_URL, {
@@ -497,13 +389,11 @@
       btn.disabled = false;
       btn.innerText = 'Kirim Jurnal Mengajar';
       msg.style.color = '#2E7D32';
-      msg.innerText = ' Data dan foto berhasil dikirim!';
+      msg.innerText = ' Data berhasil dikirim ke Google Sheets!';
 
       const email = document.getElementById('emailGuru').value;
       document.getElementById('jurnalForm').reset();
       document.getElementById('emailGuru').value = email;
-      compressedBase64Foto = "";
-      document.getElementById('previewContainer').style.display = 'none';
       resetFormDropdowns();
     })
     .catch(err => {
