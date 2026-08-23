@@ -196,6 +196,17 @@
         <label>Deskripsi Kegiatan</label>
         <textarea id="deskripsi" required placeholder="Jelaskan alur kegiatan pembelajaran secara singkat..."></textarea>
       </div>
+      
+      <div class="form-group">
+    <label for="mediaAjar">Media & Bahan Main / APE</label>
+    <input type="text" id="mediaAjar" placeholder="Contoh: Kertas origami, lem, biji-bijian kolase, loose parts, balok, dll.">
+  </div>
+
+  <div class="form-group">
+    <label for="catatan">Catatan Pengamatan Siswa</label>
+    <textarea id="catatan" placeholder="Tuliskan Fakta Lapangan: perilaku, respon, atau kejadian unik anak saat kegiatan..."></textarea>
+  </div>
+</div>
       <div class="form-group">
         <label>Catatan Pengamatan Siswa</label>
         <textarea id="catatan" placeholder="Tuliskan Fakta Lapangan: perilaku, respon, atau kejadian unik anak saat kegiatan..."></textarea>
@@ -351,6 +362,7 @@
       doa: document.getElementById('doa').value,
       topik: document.getElementById('topik').value,
       deskripsi: document.getElementById('deskripsi').value,
+      mediaAjar: document.getElementById('mediaAjar').value,
       catatan: document.getElementById('catatan').value,
       keberhasilan: document.getElementById('keberhasilan').value,
       perbaikan: document.getElementById('perbaikan').value,
