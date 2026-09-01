@@ -436,31 +436,34 @@
   }
 
   function updateSiswaDropdowns(selectedKelas) {
-    const dhuhaSelect = document.getElementById('imamDhuha');
-    const dzuhurSelect = document.getElementById('imamDzuhur');
+  const dhuhaSelect = document.getElementById('imamDhuha');
+  const dzuhurSelect = document.getElementById('imamDzuhur');
 
-    if (!selectedKelas) {
-      const defaultOpt = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
-      dhuhaSelect.innerHTML = defaultOpt;
-      dzuhurSelect.innerHTML = defaultOpt;
-      return;
-    }
-
-    const filteredSiswa = allSiswaData.filter(s => s.kelas === selectedKelas);
-
-    if (filteredSiswa.length === 0) {
-      const noDataOpt = '<option value="">-- Tidak ada siswa di kelas ini --</option>';
-      dhuhaSelect.innerHTML = noDataOpt;
-      dzuhurSelect.innerHTML = noDataOpt;
-      return;
-    }
-
-    const optionsHtml = '<option value="">-- Pilih Siswa --</option>' + 
-      filteredSiswa.map(s => `<option value="${s.nama}">${s.nama}</option>`).join('');
-
-    dhuhaSelect.innerHTML = optionsHtml;
-    dzuhurSelect.innerHTML = optionsHtml;
+  if (!selectedKelas) {
+    const defaultOpt = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
+    dhuhaSelect.innerHTML = defaultOpt;
+    dzuhurSelect.innerHTML = defaultOpt;
+    return;
   }
+
+  // Bandingkan dengan .toUpperCase() agar tidak terpengaruh kapitalisasi
+  const filteredSiswa = allSiswaData.filter(s => 
+    s.kelas.trim().toUpperCase() === selectedKelas.trim().toUpperCase()
+  );
+
+  if (filteredSiswa.length === 0) {
+    const noDataOpt = '<option value="">-- Tidak ada siswa di kelas ini --</option>';
+    dhuhaSelect.innerHTML = noDataOpt;
+    dzuhurSelect.innerHTML = noDataOpt;
+    return;
+  }
+
+  const optionsHtml = '<option value="">-- Pilih Siswa --</option>' + 
+    filteredSiswa.map(s => `<option value="${s.nama}">${s.nama}</option>`).join('');
+
+  dhuhaSelect.innerHTML = optionsHtml;
+  dzuhurSelect.innerHTML = optionsHtml;
+}
 
   document.getElementById('jurnalForm').addEventListener('submit', function(e) {
     e.preventDefault();
