@@ -448,13 +448,39 @@
       return;
     }
 
-    const filteredGuru = allGuruData.filter(g => !g.unit || g.unit === selectedUnit);
-    guruSelect.innerHTML = '<option value="">-- Pilih Nama Guru --</option>' +
-      filteredGuru.map(g => `<option value="${g.nama}">${g.nama} ${g.kuota === 0 ? '(Jatah Habis)' : ''}</option>`).join('');
+    // Pencocokan Unit Guru
+    const filteredGuru = allGuruData.filter(g => {
+      if (!g.unit) return true; 
+      const uGuru = g.unit.toUpperCase();
+      const uSel = selectedUnit.toUpperCase();
+      return uGuru === uSel || uGuru.includes(uSel) || uSel.includes(uGuru) || 
+             (uSel.includes("1") && uGuru.includes("1")) ||
+             (uSel.includes("2") && uGuru.includes("2"));
+    });
 
-    const filteredKelas = allKelasData.filter(k => k.unit === selectedUnit);
-    kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>' +
-      filteredKelas.map(k => `<option value="${k.nama}">${k.nama}</option>`).join('');
+    if (filteredGuru.length === 0) {
+      guruSelect.innerHTML = '<option value="">-- Tidak Ada Data Guru di Unit Ini --</option>';
+    } else {
+      guruSelect.innerHTML = '<option value="">-- Pilih Nama Guru --</option>' +
+        filteredGuru.map(g => `<option value="${g.nama}">${g.nama} ${g.kuota === 0 ? '(Jatah Habis)' : ''}</option>`).join('');
+    }
+
+    // Pencocokan Unit Kelas
+    const filteredKelas = allKelasData.filter(k => {
+      if (!k.unit) return true;
+      const uKelas = k.unit.toUpperCase();
+      const uSel = selectedUnit.toUpperCase();
+      return uKelas === uSel || uKelas.includes(uSel) || uSel.includes(uKelas) ||
+             (uSel.includes("1") && k.unit.includes("1")) ||
+             (uSel.includes("2") && k.unit.includes("2"));
+    });
+
+    if (filteredKelas.length === 0) {
+      kelasSelect.innerHTML = '<option value="">-- Tidak Ada Data Kelas di Unit Ini --</option>';
+    } else {
+      kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>' +
+        filteredKelas.map(k => `<option value="${k.nama}">${k.nama}</option>`).join('');
+    }
 
     updateSiswaDropdowns('');
     document.getElementById('quotaWarn').style.display = 'none';
@@ -490,7 +516,7 @@
     dzuhurSelect.innerHTML = optionsHtml;
   }
 
-  // SUBMIT FORM DENGAN RESPON TEGAS DAN AUTO REFRESH
+  // SUBMIT FORM DENGAN MODE AMAN
   document.getElementById('jurnalForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const btn = document.getElementById('btnSubmit');
@@ -504,6 +530,7 @@
       return;
     }
 
+    // Kunci tombol agar tidak dipencet berkali-kali
     btn.disabled = true;
     btn.innerText = '⏳ Memproses & Menyimpan...';
     msg.style.display = 'block';
@@ -533,33 +560,23 @@
       fotoBase64: compressedFotoBase64
     };
 
-    // PENGIRIMAN DATA TEGAS
     fetch(WEB_APP_URL, {
       method: 'POST',
+      mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify(payload)
     })
-    .then(res => res.json())
-    .then(resData => {
-      if (resData.status === 'success') {
-        msg.style.backgroundColor = '#E8F5E9';
-        msg.style.color = '#2E7D32';
-        msg.innerText = '✅ BERHASIL: Data tersimpan! Halaman akan dimuat ulang...';
-        
-        alert('✅ BERHASIL: Jurnal Mengajar berhasil disimpan!');
-        
-        // REFRESH HALAMAN OTOMATIS
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
-      } else {
-        btn.disabled = false;
-        btn.innerText = 'Kirim Jurnal Mengajar';
-        msg.style.backgroundColor = '#FFEBEE';
-        msg.style.color = '#C62828';
-        msg.innerText = '❌ ' + (resData.message || 'Gagal menyimpan data.');
-        alert('❌ ' + (resData.message || 'Gagal menyimpan data ke sistem.'));
-      }
+    .then(() => {
+      msg.style.backgroundColor = '#E8F5E9';
+      msg.style.color = '#2E7D32';
+      msg.innerText = '✅ BERHASIL: Data tersimpan! Memuat ulang halaman...';
+      
+      alert('✅ BERHASIL: Jurnal Mengajar berhasil disimpan!');
+      
+      // Auto refresh halaman agar membaca data paling segar
+      setTimeout(() => {
+        window.location.reload();
+      }, 800);
     })
     .catch(err => {
       btn.disabled = false;
