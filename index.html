@@ -151,6 +151,69 @@
       color: var(--text-muted);
       font-weight: 600;
     }
+
+    /* Style Modal Popup Custom */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .modal-box {
+      background: #FFFFFF;
+      padding: 24px;
+      border-radius: 16px;
+      max-width: 360px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      animation: modalPop 0.25s ease-out;
+    }
+
+    @keyframes modalPop {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-icon {
+      font-size: 44px;
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+
+    .modal-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .btn-modal {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      color: #FFFFFF;
+    }
+
+    .btn-modal-success { background: var(--primary); }
+    .btn-modal-danger { background: #C62828; }
   </style>
 </head>
 <body>
@@ -310,6 +373,16 @@
   </div>
 </div>
 
+  <!-- Modal Popup Custom -->
+<div id="customModal" class="modal-overlay">
+  <div class="modal-box">
+    <div id="modalIcon" class="modal-icon"></div>
+    <div id="modalTitle" class="modal-title"></div>
+    <div id="modalDesc" class="modal-desc"></div>
+    <button type="button" id="btnModalClose" class="btn-modal" onclick="closeCustomPopup()">Oke, Paham</button>
+  </div>
+</div>
+
 <script>
   let allGuruData = [];
   let allKelasData = [];
@@ -359,12 +432,20 @@
         btnSubmit.disabled = false;
         btnSubmit.style.backgroundColor = 'var(--primary)';
         btnSubmit.innerText = 'Kirim Jurnal Mengajar (Sisa Jatah: ' + guruObj.jatah + ')';
-        alert('Halo ' + guruObj.nama + ',\n\nAnda memiliki ' + guruObj.jatah + ' jatah pengisian jurnal hari ini. Silakan lanjutkan pengisian data.');
+        showCustomPopup(
+          'Sisa Jatah: ' + guruObj.jatah,
+          'Halo ' + guruObj.nama + ', Anda memiliki ' + guruObj.jatah + ' jatah pengisian jurnal hari ini. Silakan lanjutkan pengisian data.',
+          true
+        );
       } else {
         btnSubmit.disabled = true;
         btnSubmit.style.backgroundColor = '#C62828';
         btnSubmit.innerText = '⛔ JATAH HARI INI HABIS';
-        alert('Jatah Habis!\n\nMaaf ' + guruObj.nama + ', jatah input jurnal Anda hari ini sudah terpenuhi.\n\nSilakan hubungi admin jika ada kesalahan.');
+        showCustomPopup(
+          'Jatah Habis!',
+          'Maaf ' + guruObj.nama + ', jatah input jurnal Anda hari ini sudah terpenuhi.\n\nSilakan hubungi admin jika ada kesalahan.',
+          false
+        );
       }
     }
   });
@@ -566,6 +647,34 @@
       alert('Gagal menyimpan data: ' + err.toString());
     });
   });
+
+  // Fungsi Tampil Popup Custom
+  function showCustomPopup(title, desc, isSuccess) {
+    const modal = document.getElementById('customModal');
+    const icon = document.getElementById('modalIcon');
+    const titleEl = document.getElementById('modalTitle');
+    const descEl = document.getElementById('modalDesc');
+    const btn = document.getElementById('btnModalClose');
+
+    if (isSuccess) {
+      icon.innerHTML = '✅';
+      titleEl.innerText = title;
+      descEl.innerText = desc;
+      btn.className = 'btn-modal btn-modal-success';
+    } else {
+      icon.innerHTML = '❌';
+      titleEl.innerText = title;
+      descEl.innerText = desc;
+      btn.className = 'btn-modal btn-modal-danger';
+    }
+
+    modal.style.display = 'flex';
+  }
+
+  // Fungsi Tutup Popup Custom
+  function closeCustomPopup() {
+    document.getElementById('customModal').style.display = 'none';
+  }
 </script>
 
 </body>
