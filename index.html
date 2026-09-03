@@ -83,6 +83,7 @@
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     @media (max-width: 580px) { .grid-2 { grid-template-columns: 1fr; } }
 
+    /* Style Khusus Tombol Photo */
     .btn-photo {
       width: 100%;
       background: #FFFFFF;
@@ -99,8 +100,12 @@
       justify-content: center;
       gap: 6px;
     }
-    .btn-photo:hover { background: var(--primary-light); }
-    .btn-photo:active { transform: scale(0.98); }
+    .btn-photo:hover {
+      background: var(--primary-light);
+    }
+    .btn-photo:active {
+      transform: scale(0.98);
+    }
 
     .btn-submit {
       width: 100%;
@@ -116,16 +121,13 @@
       transition: background 0.2s;
     }
     .btn-submit:hover { background: #0097A7; }
-    .btn-submit:disabled { background: #B0BEC5; cursor: not-allowed; box-shadow: none; }
 
     .status-msg {
       text-align: center;
       margin-top: 12px;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 600;
       display: none;
-      padding: 10px;
-      border-radius: 8px;
     }
 
     .preview-box {
@@ -148,14 +150,6 @@
       font-size: 12px;
       color: var(--text-muted);
       font-weight: 600;
-    }
-
-    .quota-warning {
-      color: #D32F2F;
-      font-size: 12px;
-      font-weight: 700;
-      margin-top: 4px;
-      display: none;
     }
   </style>
 </head>
@@ -192,7 +186,6 @@
           <select id="namaGuru" required>
             <option value="">Memuat data guru...</option>
           </select>
-          <div id="quotaWarn" class="quota-warning">⚠️ Jatah pengisian jurnal Anda hari ini SUDAH HABIS!</div>
         </div>
         <div class="form-group">
           <label>Kelas</label>
@@ -280,7 +273,7 @@
       </div>
     </div>
 
-    <!-- Bagian E -->
+    <!-- Bagian E: Bukti Pembelajaran (Sesuai Permintaan) -->
     <div class="section-card sec-e">
       <div class="section-title">Bagian E: Bukti Pembelajaran (Foto)</div>
       <div class="form-group">
@@ -294,7 +287,10 @@
           </button>
         </div>
 
+        <!-- Input Tersembunyi khusus Kamera -->
         <input type="file" id="inputKamera" accept="image/*" capture="environment" style="display: none;">
+        
+        <!-- Input Tersembunyi khusus Galeri -->
         <input type="file" id="inputGaleri" accept="image/*" style="display: none;">
 
         <small style="display:block; color:var(--text-muted); margin-top:8px;">*Foto akan otomatis dikompresi agar hemat kuota.</small>
@@ -345,34 +341,11 @@
     updateGuruAndKelasDropdowns(this.value);
   });
 
-  document.getElementById('namaGuru').addEventListener('change', function() {
-    cekKuotaGuru(this.value);
-  });
-
   document.getElementById('kelas').addEventListener('change', function() {
     updateSiswaDropdowns(this.value);
   });
 
-  function cekKuotaGuru(selectedNamaGuru) {
-    const btn = document.getElementById('btnSubmit');
-    const warn = document.getElementById('quotaWarn');
-    
-    if (!selectedNamaGuru) {
-      warn.style.display = 'none';
-      btn.disabled = false;
-      return;
-    }
-
-    const guruObj = allGuruData.find(g => g.nama === selectedNamaGuru);
-    if (guruObj && guruObj.kuota === 0) {
-      warn.style.display = 'block';
-      btn.disabled = true;
-    } else {
-      warn.style.display = 'none';
-      btn.disabled = false;
-    }
-  }
-
+  // FUNGSI KOMPRESI FOTO BERSAMA (Kamera & Galeri)
   function processAndCompressImage(file) {
     if (!file) {
       compressedFotoBase64 = "";
@@ -387,7 +360,7 @@
         const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
-        const maxDimension = 800;
+        const maxDimension = 800; // Resolusi max 800px
 
         if (width > height) {
           if (width > maxDimension) {
@@ -405,8 +378,11 @@
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
+
+        // Kompresi ke JPEG (Kualitas 0.7)
         compressedFotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
         
+        // Tampilkan Preview Foto
         const previewImg = document.getElementById('imgPreview');
         previewImg.src = compressedFotoBase64;
         document.getElementById('previewBox').style.display = 'block';
@@ -416,16 +392,18 @@
     reader.readAsDataURL(file);
   }
 
+  // Event Listener Kamera
   document.getElementById('inputKamera').addEventListener('change', function(e) {
     if (e.target.files && e.target.files[0]) {
-      document.getElementById('inputGaleri').value = "";
+      document.getElementById('inputGaleri').value = ""; // Reset input galeri
       processAndCompressImage(e.target.files[0]);
     }
   });
 
+  // Event Listener Galeri
   document.getElementById('inputGaleri').addEventListener('change', function(e) {
     if (e.target.files && e.target.files[0]) {
-      document.getElementById('inputKamera').value = "";
+      document.getElementById('inputKamera').value = ""; // Reset input kamera
       processAndCompressImage(e.target.files[0]);
     }
   });
@@ -435,8 +413,6 @@
     document.getElementById('kelas').innerHTML = '<option value="">-- Pilih Unit Terlebih Dahulu --</option>';
     document.getElementById('imamDhuha').innerHTML = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
     document.getElementById('imamDzuhur').innerHTML = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
-    document.getElementById('quotaWarn').style.display = 'none';
-    document.getElementById('btnSubmit').disabled = false;
   }
 
   function updateGuruAndKelasDropdowns(selectedUnit) {
@@ -448,100 +424,62 @@
       return;
     }
 
-    // Pencocokan Unit Guru
-    const filteredGuru = allGuruData.filter(g => {
-      if (!g.unit) return true; 
-      const uGuru = g.unit.toUpperCase();
-      const uSel = selectedUnit.toUpperCase();
-      return uGuru === uSel || uGuru.includes(uSel) || uSel.includes(uGuru) || 
-             (uSel.includes("1") && uGuru.includes("1")) ||
-             (uSel.includes("2") && uGuru.includes("2"));
-    });
+    const filteredGuru = allGuruData.filter(g => !g.unit || g.unit === selectedUnit);
+    guruSelect.innerHTML = '<option value="">-- Pilih Nama Guru --</option>' +
+      filteredGuru.map(g => `<option value="${g.nama}">${g.nama}</option>`).join('');
 
-    if (filteredGuru.length === 0) {
-      guruSelect.innerHTML = '<option value="">-- Tidak Ada Data Guru di Unit Ini --</option>';
-    } else {
-      guruSelect.innerHTML = '<option value="">-- Pilih Nama Guru --</option>' +
-        filteredGuru.map(g => `<option value="${g.nama}">${g.nama} ${g.kuota === 0 ? '(Jatah Habis)' : ''}</option>`).join('');
-    }
-
-    // Pencocokan Unit Kelas
-    const filteredKelas = allKelasData.filter(k => {
-      if (!k.unit) return true;
-      const uKelas = k.unit.toUpperCase();
-      const uSel = selectedUnit.toUpperCase();
-      return uKelas === uSel || uKelas.includes(uSel) || uSel.includes(uKelas) ||
-             (uSel.includes("1") && k.unit.includes("1")) ||
-             (uSel.includes("2") && k.unit.includes("2"));
-    });
-
-    if (filteredKelas.length === 0) {
-      kelasSelect.innerHTML = '<option value="">-- Tidak Ada Data Kelas di Unit Ini --</option>';
-    } else {
-      kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>' +
-        filteredKelas.map(k => `<option value="${k.nama}">${k.nama}</option>`).join('');
-    }
+    const filteredKelas = allKelasData.filter(k => k.unit === selectedUnit);
+    kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>' +
+      filteredKelas.map(k => `<option value="${k.nama}">${k.nama}</option>`).join('');
 
     updateSiswaDropdowns('');
-    document.getElementById('quotaWarn').style.display = 'none';
-    document.getElementById('btnSubmit').disabled = false;
   }
 
   function updateSiswaDropdowns(selectedKelas) {
-    const dhuhaSelect = document.getElementById('imamDhuha');
-    const dzuhurSelect = document.getElementById('imamDzuhur');
+  const dhuhaSelect = document.getElementById('imamDhuha');
+  const dzuhurSelect = document.getElementById('imamDzuhur');
 
-    if (!selectedKelas) {
-      const defaultOpt = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
-      dhuhaSelect.innerHTML = defaultOpt;
-      dzuhurSelect.innerHTML = defaultOpt;
-      return;
-    }
-
-    const filteredSiswa = allSiswaData.filter(s => 
-      s.kelas.trim().toUpperCase() === selectedKelas.trim().toUpperCase()
-    );
-
-    if (filteredSiswa.length === 0) {
-      const noDataOpt = '<option value="">-- Tidak ada siswa di kelas ini --</option>';
-      dhuhaSelect.innerHTML = noDataOpt;
-      dzuhurSelect.innerHTML = noDataOpt;
-      return;
-    }
-
-    const optionsHtml = '<option value="">-- Pilih Siswa --</option>' + 
-      filteredSiswa.map(s => `<option value="${s.nama}">${s.nama}</option>`).join('');
-
-    dhuhaSelect.innerHTML = optionsHtml;
-    dzuhurSelect.innerHTML = optionsHtml;
+  if (!selectedKelas) {
+    const defaultOpt = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
+    dhuhaSelect.innerHTML = defaultOpt;
+    dzuhurSelect.innerHTML = defaultOpt;
+    return;
   }
 
-  // SUBMIT FORM DENGAN MODE AMAN
+  // Bandingkan dengan .toUpperCase() agar tidak terpengaruh kapitalisasi
+  const filteredSiswa = allSiswaData.filter(s => 
+    s.kelas.trim().toUpperCase() === selectedKelas.trim().toUpperCase()
+  );
+
+  if (filteredSiswa.length === 0) {
+    const noDataOpt = '<option value="">-- Tidak ada siswa di kelas ini --</option>';
+    dhuhaSelect.innerHTML = noDataOpt;
+    dzuhurSelect.innerHTML = noDataOpt;
+    return;
+  }
+
+  const optionsHtml = '<option value="">-- Pilih Siswa --</option>' + 
+    filteredSiswa.map(s => `<option value="${s.nama}">${s.nama}</option>`).join('');
+
+  dhuhaSelect.innerHTML = optionsHtml;
+  dzuhurSelect.innerHTML = optionsHtml;
+}
+
   document.getElementById('jurnalForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const btn = document.getElementById('btnSubmit');
     const msg = document.getElementById('statusMsg');
 
-    const selectedNamaGuru = document.getElementById('namaGuru').value;
-    const guruObj = allGuruData.find(g => g.nama === selectedNamaGuru);
-    
-    if (guruObj && guruObj.kuota === 0) {
-      alert("⚠️ GAGAL: Jatah pengisian jurnal Anda hari ini sudah habis!");
-      return;
-    }
-
-    // Kunci tombol agar tidak dipencet berkali-kali
     btn.disabled = true;
     btn.innerText = '⏳ Memproses & Menyimpan...';
     msg.style.display = 'block';
-    msg.style.backgroundColor = '#E0F7FA';
-    msg.style.color = '#00838F';
-    msg.innerText = 'Mengirim data ke sistem... Harap tunggu.';
+    msg.style.color = '#00ACC1';
+    msg.innerText = 'Sedang mengirim data ke Google Sheets...';
 
     const payload = {
       unit: document.getElementById('unit').value,
       emailGuru: document.getElementById('emailGuru').value,
-      namaGuru: selectedNamaGuru,
+      namaGuru: document.getElementById('namaGuru').value,
       kelas: document.getElementById('kelas').value,
       pertemuan: document.getElementById('pertemuan').value,
       jumlahSiswa: document.getElementById('jumlahSiswa').value,
@@ -567,24 +505,27 @@
       body: JSON.stringify(payload)
     })
     .then(() => {
-      msg.style.backgroundColor = '#E8F5E9';
+      btn.disabled = false;
+      btn.innerText = 'Kirim Jurnal Mengajar';
       msg.style.color = '#2E7D32';
-      msg.innerText = '✅ BERHASIL: Data tersimpan! Memuat ulang halaman...';
+      msg.innerText = ' Data berhasil dikirim ke Google Sheets!';
+
+      const email = document.getElementById('emailGuru').value;
+      document.getElementById('jurnalForm').reset();
+      document.getElementById('emailGuru').value = email;
       
-      alert('✅ BERHASIL: Jurnal Mengajar berhasil disimpan!');
-      
-      // Auto refresh halaman agar membaca data paling segar
-      setTimeout(() => {
-        window.location.reload();
-      }, 800);
+      // Reset input foto & preview
+      document.getElementById('inputKamera').value = "";
+      document.getElementById('inputGaleri').value = "";
+      compressedFotoBase64 = "";
+      document.getElementById('previewBox').style.display = 'none';
+      resetFormDropdowns();
     })
     .catch(err => {
       btn.disabled = false;
       btn.innerText = 'Kirim Jurnal Mengajar';
-      msg.style.backgroundColor = '#FFEBEE';
       msg.style.color = '#C62828';
-      msg.innerText = '❌ GAGAL KONEKSI: Data tidak terkirim.';
-      alert('❌ GAGAL KONEKSI: Mohon periksa jaringan internet Anda dan coba lagi.');
+      msg.innerText = 'Gagal menyimpan data.';
     });
   });
 </script>
