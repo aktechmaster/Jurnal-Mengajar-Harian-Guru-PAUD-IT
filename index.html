@@ -20,8 +20,10 @@
       --text-muted: #78909C;
       --border-color: #CFD8DC;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nunito', sans-serif; }
     body { background-color: var(--bg-color); color: var(--text-dark); padding: 20px 12px; }
+
     .container {
       max-width: 720px;
       margin: 0 auto;
@@ -30,6 +32,7 @@
       padding: 28px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.05);
     }
+
     .header {
       text-align: center;
       margin-bottom: 24px;
@@ -38,6 +41,7 @@
     }
     .header h1 { font-size: 22px; color: var(--primary); font-weight: 700; }
     .header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
     .section-card {
       border-radius: 14px;
       padding: 18px;
@@ -49,14 +53,17 @@
     .sec-c { background-color: var(--accent-green); }
     .sec-d { background-color: var(--accent-pink); }
     .sec-e { background-color: var(--accent-purple); }
+
     .section-title {
       font-size: 15px;
       font-weight: 700;
       margin-bottom: 14px;
       color: var(--text-dark);
     }
+
     .form-group { margin-bottom: 12px; }
     label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; }
+
     input[type="text"], input[type="email"], input[type="number"], select, textarea {
       width: 100%;
       padding: 10px 12px;
@@ -72,8 +79,11 @@
       box-shadow: 0 0 0 3px rgba(0, 172, 193, 0.2);
     }
     textarea { resize: vertical; min-height: 75px; }
+
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     @media (max-width: 580px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* Style Khusus Tombol Photo */
     .btn-photo {
       width: 100%;
       background: #FFFFFF;
@@ -90,8 +100,13 @@
       justify-content: center;
       gap: 6px;
     }
-    .btn-photo:hover { background: var(--primary-light); }
-    .btn-photo:active { transform: scale(0.98); }
+    .btn-photo:hover {
+      background: var(--primary-light);
+    }
+    .btn-photo:active {
+      transform: scale(0.98);
+    }
+
     .btn-submit {
       width: 100%;
       background: var(--primary);
@@ -106,15 +121,15 @@
       transition: background 0.2s;
     }
     .btn-submit:hover { background: #0097A7; }
+
     .status-msg {
       text-align: center;
       margin-top: 12px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       display: none;
-      padding: 10px;
-      border-radius: 8px;
     }
+
     .preview-box {
       margin-top: 14px;
       text-align: center;
@@ -126,6 +141,7 @@
       border-radius: 10px;
       border: 2px solid var(--primary);
     }
+
     .footer {
       text-align: center;
       margin-top: 24px;
@@ -135,22 +151,17 @@
       color: var(--text-muted);
       font-weight: 600;
     }
-    .info-sisa {
-      font-size: 12px;
-      margin-top: 5px;
-      padding: 4px 8px;
-      border-radius: 6px;
-      display: none;
-    }
   </style>
 </head>
 <body>
+
 <div class="container">
   <div class="header">
     <img src="logosit1.png" alt="Logo SIT Al-Kautsar" style="max-width: 110px; height: auto; margin-bottom: 12px;">
     <h1>Jurnal Mengajar PAUD IT Al-Kautsar</h1>
     <p>Sistem Input Informasi Kegiatan Pembelajaran Harian</p>
   </div>
+
   <form id="jurnalForm">
     <!-- Bagian A -->
     <div class="section-card sec-a">
@@ -175,7 +186,6 @@
           <select id="namaGuru" required>
             <option value="">Memuat data guru...</option>
           </select>
-          <div id="infoSisaJatah" class="info-sisa"></div>
         </div>
         <div class="form-group">
           <label>Kelas</label>
@@ -195,6 +205,7 @@
         </div>
       </div>
     </div>
+
     <!-- Bagian B -->
     <div class="section-card sec-b">
       <div class="section-title">Bagian B: Pembiasaan & Hafalan</div>
@@ -223,6 +234,7 @@
         </div>
       </div>
     </div>
+
     <!-- Bagian C -->
     <div class="section-card sec-c">
       <div class="section-title">Bagian C: Kegiatan Inti Pembelajaran</div>
@@ -243,6 +255,7 @@
         <textarea id="catatan" placeholder="Tuliskan Fakta Lapangan: perilaku, respon, atau kejadian unik anak saat kegiatan..."></textarea>
       </div>
     </div>
+
     <!-- Bagian D -->
     <div class="section-card sec-d">
       <div class="section-title">Bagian D: Refleksi Guru</div>
@@ -259,7 +272,8 @@
         <textarea id="rtl" placeholder="Contoh: Menyiapkan alat peraga ekstra untuk anak yang butuh pendampingan khusus."></textarea>
       </div>
     </div>
-    <!-- Bagian E: Bukti Pembelajaran -->
+
+    <!-- Bagian E: Bukti Pembelajaran (Sesuai Permintaan) -->
     <div class="section-card sec-e">
       <div class="section-title">Bagian E: Bukti Pembelajaran (Foto)</div>
       <div class="form-group">
@@ -272,49 +286,52 @@
             🖼️ Pilih dari Galeri
           </button>
         </div>
+
+        <!-- Input Tersembunyi khusus Kamera -->
         <input type="file" id="inputKamera" accept="image/*" capture="environment" style="display: none;">
+        
+        <!-- Input Tersembunyi khusus Galeri -->
         <input type="file" id="inputGaleri" accept="image/*" style="display: none;">
+
         <small style="display:block; color:var(--text-muted); margin-top:8px;">*Foto akan otomatis dikompresi agar hemat kuota.</small>
       </div>
+
       <div class="preview-box" id="previewBox">
         <img id="imgPreview" src="" alt="Preview Foto">
       </div>
     </div>
+
     <button type="submit" class="btn-submit" id="btnSubmit">Kirim Jurnal Mengajar</button>
     <div class="status-msg" id="statusMsg"></div>
   </form>
+
   <div class="footer">
     PAUD IT Al-Kautsar Mukomuko 2026 | Designed and Developed by aktechmaster
   </div>
 </div>
+
 <script>
   let allGuruData = [];
   let allKelasData = [];
   let allSiswaData = [];
-  let sisaJatahGuru = {}; // ✅ Menampung sisa jatah dari server
   let compressedFotoBase64 = "";
+
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwD0ljrlxxjEFLbBcCo610X13zxk8zSECTpMXCABsQzatcCbyKU7uEPkfOv1GvEsi4OXQ/exec";
 
   document.addEventListener('DOMContentLoaded', () => {
     const savedEmail = localStorage.getItem('paud_guru_email');
     if (savedEmail) document.getElementById('emailGuru').value = savedEmail;
-    muatDataServer();
-  });
 
-  // ✅ Fungsi muat ulang data TERBARU dari server
-  async function muatDataServer() {
-    try {
-      const res = await fetch(WEB_APP_URL);
-      const data = await res.json();
-      allGuruData = data.guru || [];
-      allKelasData = data.kelas || [];
-      allSiswaData = data.siswa || [];
-      sisaJatahGuru = data.sisaJatah || {};
-      resetFormDropdowns();
-    } catch (err) {
-      console.error("Gagal memuat data:", err);
-    }
-  }
+    fetch(WEB_APP_URL)
+      .then(res => res.json())
+      .then(data => {
+        allGuruData = data.guru || [];
+        allKelasData = data.kelas || [];
+        allSiswaData = data.siswa || [];
+        resetFormDropdowns();
+      })
+      .catch(err => console.error("Gagal memuat data database:", err));
+  });
 
   document.getElementById('emailGuru').addEventListener('input', (e) => {
     localStorage.setItem('paud_guru_email', e.target.value);
@@ -324,35 +341,18 @@
     updateGuruAndKelasDropdowns(this.value);
   });
 
-  // ✅ Saat nama guru dipilih → tampilkan sisa jatah
-  document.getElementById('namaGuru').addEventListener('change', function() {
-    const infoBox = document.getElementById('infoSisaJatah');
-    const nama = (this.value || "").trim().toUpperCase();
-
-    if (!nama) {
-      infoBox.style.display = 'none';
-      return;
-    }
-
-    const sisa = sisaJatahGuru[nama] ?? 1;
-    infoBox.style.display = 'block';
-    if (sisa <= 0) {
-      infoBox.style.backgroundColor = '#FFEBEE';
-      infoBox.style.color = '#C62828';
-      infoBox.innerHTML = '❌ <strong>Jatah pengisian habis!</strong>';
-    } else {
-      infoBox.style.backgroundColor = '#E8F5E9';
-      infoBox.style.color = '#2E7D32';
-      infoBox.innerHTML = '✅ Sisa jatah: <strong>' + sisa + '</strong> kali';
-    }
+  document.getElementById('kelas').addEventListener('change', function() {
+    updateSiswaDropdowns(this.value);
   });
 
+  // FUNGSI KOMPRESI FOTO BERSAMA (Kamera & Galeri)
   function processAndCompressImage(file) {
     if (!file) {
       compressedFotoBase64 = "";
       document.getElementById('previewBox').style.display = 'none';
       return;
     }
+
     const reader = new FileReader();
     reader.onload = function(event) {
       const img = new Image();
@@ -360,7 +360,8 @@
         const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
-        const maxDimension = 800;
+        const maxDimension = 800; // Resolusi max 800px
+
         if (width > height) {
           if (width > maxDimension) {
             height = Math.round((height * maxDimension) / width);
@@ -372,11 +373,16 @@
             height = maxDimension;
           }
         }
+
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
+
+        // Kompresi ke JPEG (Kualitas 0.7)
         compressedFotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+        
+        // Tampilkan Preview Foto
         const previewImg = document.getElementById('imgPreview');
         previewImg.src = compressedFotoBase64;
         document.getElementById('previewBox').style.display = 'block';
@@ -386,16 +392,18 @@
     reader.readAsDataURL(file);
   }
 
+  // Event Listener Kamera
   document.getElementById('inputKamera').addEventListener('change', function(e) {
     if (e.target.files && e.target.files[0]) {
-      document.getElementById('inputGaleri').value = "";
+      document.getElementById('inputGaleri').value = ""; // Reset input galeri
       processAndCompressImage(e.target.files[0]);
     }
   });
 
+  // Event Listener Galeri
   document.getElementById('inputGaleri').addEventListener('change', function(e) {
     if (e.target.files && e.target.files[0]) {
-      document.getElementById('inputKamera').value = "";
+      document.getElementById('inputKamera').value = ""; // Reset input kamera
       processAndCompressImage(e.target.files[0]);
     }
   });
@@ -405,72 +413,68 @@
     document.getElementById('kelas').innerHTML = '<option value="">-- Pilih Unit Terlebih Dahulu --</option>';
     document.getElementById('imamDhuha').innerHTML = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
     document.getElementById('imamDzuhur').innerHTML = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
-    document.getElementById('infoSisaJatah').style.display = 'none';
   }
 
   function updateGuruAndKelasDropdowns(selectedUnit) {
     const guruSelect = document.getElementById('namaGuru');
     const kelasSelect = document.getElementById('kelas');
+
     if (!selectedUnit) {
       resetFormDropdowns();
       return;
     }
+
     const filteredGuru = allGuruData.filter(g => !g.unit || g.unit === selectedUnit);
     guruSelect.innerHTML = '<option value="">-- Pilih Nama Guru --</option>' +
       filteredGuru.map(g => `<option value="${g.nama}">${g.nama}</option>`).join('');
+
     const filteredKelas = allKelasData.filter(k => k.unit === selectedUnit);
     kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>' +
       filteredKelas.map(k => `<option value="${k.nama}">${k.nama}</option>`).join('');
+
     updateSiswaDropdowns('');
   }
 
   function updateSiswaDropdowns(selectedKelas) {
-    const dhuhaSelect = document.getElementById('imamDhuha');
-    const dzuhurSelect = document.getElementById('imamDzuhur');
-    if (!selectedKelas) {
-      const defaultOpt = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
-      dhuhaSelect.innerHTML = defaultOpt;
-      dzuhurSelect.innerHTML = defaultOpt;
-      return;
-    }
-    const filteredSiswa = allSiswaData.filter(s =>
-      s.kelas.trim().toUpperCase() === selectedKelas.trim().toUpperCase()
-    );
-    if (filteredSiswa.length === 0) {
-      const noDataOpt = '<option value="">-- Tidak ada siswa di kelas ini --</option>';
-      dhuhaSelect.innerHTML = noDataOpt;
-      dzuhurSelect.innerHTML = noDataOpt;
-      return;
-    }
-    const optionsHtml = '<option value="">-- Pilih Siswa --</option>' +
-      filteredSiswa.map(s => `<option value="${s.nama}">${s.nama}</option>`).join('');
-    dhuhaSelect.innerHTML = optionsHtml;
-    dzuhurSelect.innerHTML = optionsHtml;
+  const dhuhaSelect = document.getElementById('imamDhuha');
+  const dzuhurSelect = document.getElementById('imamDzuhur');
+
+  if (!selectedKelas) {
+    const defaultOpt = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
+    dhuhaSelect.innerHTML = defaultOpt;
+    dzuhurSelect.innerHTML = defaultOpt;
+    return;
   }
 
-  // ✅ FORM KIRIM: TEGAS + REFRESH DATA SETELAH KIRIM
-  document.getElementById('jurnalForm').addEventListener('submit', async function(e) {
+  // Bandingkan dengan .toUpperCase() agar tidak terpengaruh kapitalisasi
+  const filteredSiswa = allSiswaData.filter(s => 
+    s.kelas.trim().toUpperCase() === selectedKelas.trim().toUpperCase()
+  );
+
+  if (filteredSiswa.length === 0) {
+    const noDataOpt = '<option value="">-- Tidak ada siswa di kelas ini --</option>';
+    dhuhaSelect.innerHTML = noDataOpt;
+    dzuhurSelect.innerHTML = noDataOpt;
+    return;
+  }
+
+  const optionsHtml = '<option value="">-- Pilih Siswa --</option>' + 
+    filteredSiswa.map(s => `<option value="${s.nama}">${s.nama}</option>`).join('');
+
+  dhuhaSelect.innerHTML = optionsHtml;
+  dzuhurSelect.innerHTML = optionsHtml;
+}
+
+  document.getElementById('jurnalForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const btn = document.getElementById('btnSubmit');
     const msg = document.getElementById('statusMsg');
-    const namaGuruDipilih = (document.getElementById('namaGuru').value || "").trim().toUpperCase();
-    const sisa = sisaJatahGuru[namaGuruDipilih] ?? 1;
-
-    // ✅ CEK LOKAL DULU
-    if (sisa <= 0) {
-      msg.style.display = 'block';
-      msg.style.backgroundColor = '#FFEBEE';
-      msg.style.color = '#C62828';
-      msg.innerHTML = '❌ <strong>Maaf, jatah mengisi jurnal Anda telah habis.</strong>';
-      return; // ❌ TIDAK DIKIRIM
-    }
 
     btn.disabled = true;
-    btn.innerText = '⏳ Sedang mengirim...';
+    btn.innerText = '⏳ Memproses & Menyimpan...';
     msg.style.display = 'block';
-    msg.style.backgroundColor = '#E0F7FA';
     msg.style.color = '#00ACC1';
-    msg.innerText = 'Sedang mengirim data...';
+    msg.innerText = 'Sedang mengirim data ke Google Sheets...';
 
     const payload = {
       unit: document.getElementById('unit').value,
@@ -494,55 +498,37 @@
       fotoBase64: compressedFotoBase64
     };
 
-    try {
-      // ✅ TANPA no-cors → BISA BACA JAWABAN SERVER
-      const res = await fetch(WEB_APP_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const hasil = await res.json();
+    fetch(WEB_APP_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    })
+    .then(() => {
+      btn.disabled = false;
+      btn.innerText = 'Kirim Jurnal Mengajar';
+      msg.style.color = '#2E7D32';
+      msg.innerText = ' Data berhasil dikirim ke Google Sheets!';
 
-      if (hasil.status === 'success') {
-        // ✅ BERHASIL
-        msg.style.backgroundColor = '#E8F5E9';
-        msg.style.color = '#2E7D32';
-        msg.innerHTML = '✅ <strong>TERKIRIM!</strong> Data berhasil disimpan.';
-
-        // ✅ REFRESH DATA LANGSUNG → baca sisa jatah TERBARU
-        await muatDataServer();
-
-        // Reset form tapi simpan email
-        const email = document.getElementById('emailGuru').value;
-        document.getElementById('jurnalForm').reset();
-        document.getElementById('emailGuru').value = email;
-        document.getElementById('inputKamera').value = "";
-        document.getElementById('inputGaleri').value = "";
-        compressedFotoBase64 = "";
-        document.getElementById('previewBox').style.display = 'none';
-        resetFormDropdowns();
-
-      } else if (hasil.status === 'jatah_habis') {
-        // ❌ Jatah habis menurut SERVER
-        msg.style.backgroundColor = '#FFEBEE';
-        msg.style.color = '#C62828';
-        msg.innerHTML = '❌ <strong>' + hasil.message + '</strong>';
-        await muatDataServer(); // Refresh data terbaru
-
-      } else {
-        throw new Error(hasil.message || 'Gagal menyimpan data');
-      }
-
-    } catch (err) {
-      // ❌ BENAR-BENAR GAGAL
-      msg.style.backgroundColor = '#FFEBEE';
+      const email = document.getElementById('emailGuru').value;
+      document.getElementById('jurnalForm').reset();
+      document.getElementById('emailGuru').value = email;
+      
+      // Reset input foto & preview
+      document.getElementById('inputKamera').value = "";
+      document.getElementById('inputGaleri').value = "";
+      compressedFotoBase64 = "";
+      document.getElementById('previewBox').style.display = 'none';
+      resetFormDropdowns();
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.innerText = 'Kirim Jurnal Mengajar';
       msg.style.color = '#C62828';
-      msg.innerHTML = '❌ <strong>GAGAL!</strong> ' + err.message;
-    }
-
-    btn.disabled = false;
-    btn.innerText = 'Kirim Jurnal Mengajar';
+      msg.innerText = 'Gagal menyimpan data.';
+    });
   });
 </script>
+
 </body>
 </html>
