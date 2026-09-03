@@ -341,6 +341,34 @@
     updateGuruAndKelasDropdowns(this.value);
   });
 
+  document.getElementById('namaGuru').addEventListener('change', function() {
+    const selectedNama = this.value;
+    const btnSubmit = document.getElementById('btnSubmit');
+
+    if (!selectedNama) {
+      btnSubmit.disabled = false;
+      btnSubmit.style.backgroundColor = 'var(--primary)';
+      btnSubmit.innerText = 'Kirim Jurnal Mengajar';
+      return;
+    }
+
+    const guruObj = allGuruData.find(g => g.nama === selectedNama);
+
+    if (guruObj) {
+      if (guruObj.jatah > 0) {
+        btnSubmit.disabled = false;
+        btnSubmit.style.backgroundColor = 'var(--primary)';
+        btnSubmit.innerText = 'Kirim Jurnal Mengajar (Sisa Jatah: ' + guruObj.jatah + ')';
+        alert('Halo ' + guruObj.nama + ',\n\nAnda memiliki ' + guruObj.jatah + ' jatah pengisian jurnal hari ini. Silakan lanjutkan pengisian data.');
+      } else {
+        btnSubmit.disabled = true;
+        btnSubmit.style.backgroundColor = '#C62828';
+        btnSubmit.innerText = '⛔ JATAH HARI INI HABIS';
+        alert('Jatah Habis!\n\nMaaf ' + guruObj.nama + ', jatah input jurnal Anda hari ini sudah terpenuhi.\n\nSilakan hubungi admin jika ada kesalahan.');
+      }
+    }
+  });
+
   document.getElementById('kelas').addEventListener('change', function() {
     updateSiswaDropdowns(this.value);
   });
