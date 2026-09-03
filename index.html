@@ -426,7 +426,10 @@
 
     const filteredGuru = allGuruData.filter(g => !g.unit || g.unit === selectedUnit);
     guruSelect.innerHTML = '<option value="">-- Pilih Nama Guru --</option>' +
-      filteredGuru.map(g => `<option value="${g.nama}">${g.nama}</option>`).join('');
+      filteredGuru.map(g => {
+        const statusJatah = g.jatah > 0 ? '' : ' (Jatah Habis)';
+        return `<option value="${g.nama}">${g.nama}${statusJatah}</option>`;
+      }).join('');
 
     const filteredKelas = allKelasData.filter(k => k.unit === selectedUnit);
     kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>' +
@@ -467,6 +470,16 @@
 
   document.getElementById('jurnalForm').addEventListener('submit', function(e) {
     e.preventDefault();
+
+    const selectedNamaGuru = document.getElementById('namaGuru').value;
+    const selectedGuruObj = allGuruData.find(g => g.nama === selectedNamaGuru);
+
+    // Cek jatah di frontend terlebih dahulu
+    if (selectedGuruObj && selectedGuruObj.jatah <= 0) {
+      alert('Pengisian ditolak: Jatah pengisian jurnal untuk ' + selectedNamaGuru + ' sudah habis atau sudah diisi!');
+      return;
+    }
+
     const btn = document.getElementById('btnSubmit');
     const msg = document.getElementById('statusMsg');
 
@@ -479,7 +492,7 @@
     const payload = {
       unit: document.getElementById('unit').value,
       emailGuru: document.getElementById('emailGuru').value,
-      namaGuru: document.getElementById('namaGuru').value,
+      namaGuru: selectedNamaGuru,
       kelas: document.getElementById('kelas').value,
       pertemuan: document.getElementById('pertemuan').value,
       jumlahSiswa: document.getElementById('jumlahSiswa').value,
@@ -500,32 +513,32 @@
 
     fetch(WEB_APP_URL, {
       method: 'POST',
-      mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify(payload)
     })
-    .then(() => {
-      btn.disabled = false;
-      btn.innerText = 'Kirim Jurnal Mengajar';
-      msg.style.color = '#2E7D32';
-      msg.innerText = ' Data berhasil dikirim ke Google Sheets!';
-
-      const email = document.getElementById('emailGuru').value;
-      document.getElementById('jurnalForm').reset();
-      document.getElementById('emailGuru').value = email;
-      
-      // Reset input foto & preview
-      document.getElementById('inputKamera').value = "";
-      document.getElementById('inputGaleri').value = "";
-      compressedFotoBase64 = "";
-      document.getElementById('previewBox').style.display = 'none';
-      resetFormDropdowns();
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === 'success') {
+        btn.innerText = 'Kirim Jurnal Mengajar';
+        msg.style.color = '#2E7D32';
+        msg.innerText = 'Data berhasil dikirim ke Google Sheets!';
+        
+        alert('Berhasil menyimpan jurnal!');
+        window.location.reload();
+      } else {
+        btn.disabled = false;
+        btn.innerText = 'Kirim Jurnal Mengajar';
+        msg.style.color = '#C62828';
+        msg.innerText = data.message || 'Gagal menyimpan data.';
+        alert(data.message || 'Gagal menyimpan data.');
+      }
     })
     .catch(err => {
       btn.disabled = false;
       btn.innerText = 'Kirim Jurnal Mengajar';
       msg.style.color = '#C62828';
-      msg.innerText = 'Gagal menyimpan data.';
+      msg.innerText = 'Gagal menyimpan data: ' + err.toString();
+      alert('Gagal menyimpan data: ' + err.toString());
     });
   });
 </script>
