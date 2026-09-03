@@ -426,10 +426,7 @@
 
     const filteredGuru = allGuruData.filter(g => !g.unit || g.unit === selectedUnit);
     guruSelect.innerHTML = '<option value="">-- Pilih Nama Guru --</option>' +
-      filteredGuru.map(g => {
-        const statusJatah = g.jatah > 0 ? '' : ' (Jatah Habis)';
-        return `<option value="${g.nama}">${g.nama}${statusJatah}</option>`;
-      }).join('');
+      filteredGuru.map(g => `<option value="${g.nama}">${g.nama}</option>`).join('');
 
     const filteredKelas = allKelasData.filter(k => k.unit === selectedUnit);
     kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>' +
